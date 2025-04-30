@@ -13,7 +13,7 @@ Uni-Tracker è un'applicazione web semplice e intuitiva per tenere traccia degli
 
 ## Come Utilizzare
 
-1. Apri il file `index.html` in un browser o accedi al link daddy91709.github.io/uni-tracker/.
+1. Apri il file `index.html` in un browser o accedi al [link](daddy91709.github.io/uni-tracker/).
 2. Usa il pulsante "Aggiungi Esame" per aggiungere una nuova riga alla tabella.
 3. Compila i campi "Nome Esame", "CFU" e "Voto".
 4. Premi "Calcola Medie" per visualizzare i risultati nella sezione "Risultati".
