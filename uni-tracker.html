@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro Esami Universitari</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f4f9; 
+            color: #333; 
+            line-height: 1.6; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+        }
+        h1 { 
+            color: #007BFF; 
+            font-size: 28px; 
+            margin-bottom: 20px; 
+            text-align: center; 
+        }
+        table { 
+            border-collapse: collapse; 
+            width: 90%; 
+            max-width: 800px; 
+            margin: 20px 0; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+            background-color: #fff; 
+            border-radius: 8px; 
+            overflow: hidden; 
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px; 
+            text-align: left; 
+        }
+        th { 
+            background-color: #007BFF; 
+            color: white; 
+            text-transform: uppercase; 
+            font-size: 14px; 
+        }
+        td input { 
+            width: 100%; 
+            box-sizing: border-box; 
+            padding: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+        }
+        .result-box { 
+            border: 1px solid #ddd; 
+            padding: 20px; 
+            margin-top: 20px; 
+            width: 90%; 
+            max-width: 800px; 
+            background-color: #fff; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+            border-radius: 8px; 
+            text-align: center; 
+        }
+        .result-item { 
+            margin: 10px 0; 
+            font-weight: bold; 
+            font-size: 16px; 
+        }
+        button { 
+            padding: 10px 20px; 
+            background-color: #007BFF; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            transition: background-color 0.3s ease; 
+            margin: 5px; 
+        }
+        button:hover { 
+            background-color: #0056b3; 
+        }
+        button:active { 
+            background-color: #004494; 
+        }
+        button:focus { 
+            outline: none; 
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); 
+        }
+        .button-container { 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        @media (max-width: 768px) {
+            table { 
+                width: 100%; 
+            }
+            th, td { 
+                font-size: 12px; 
+                padding: 8px; 
+            }
+            .button-container { 
+                flex-direction: column; 
+                gap: 5px; 
+            }
+            button { 
+                width: 100%; 
+            }
+            .result-box { 
+                width: 95%; 
+            }
+        }
+        @media (max-width: 480px) {
+            h1 { 
+                font-size: 22px; 
+            }
+            th, td { 
+                font-size: 10px; 
+                padding: 6px; 
+            }
+            button { 
+                font-size: 12px; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Registro Esami Universitari</h1>
+    
+    <div class="button-container">
+        <button onclick="aggiungiRiga()">Aggiungi Esame</button>
+        <button onclick="calcolaMetriche()">Calcola Medie</button>
+    </div>
+    
+    <table id="tabellaEsami">
+        <thead>
+            <tr>
+                <th>Nome Esame</th>
+                <th>CFU</th>
+                <th>Voto</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="text" placeholder="Nome esame"></td>
+                <td><input type="number" min="1" max="30" placeholder="CFU"></td>
+                <td><input type="number" min="18" max="30" placeholder="Voto"></td>
+                <td><button onclick="rimuoviRiga(this)">Rimuovi</button></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="result-box">
+        <h3>Risultati</h3>
+        <div class="result-item">Media Ponderata: <span id="mediaPonderata">-</span></div>
+        <div class="result-item">Media Ponderata (sconto 5 CFU): <span id="mediaPonderataSconto">-</span></div>
+        <div class="result-item">Previsione Voto di Laurea (base 110): <span id="previsioneLaurea">-</span></div>
+    </div>
+
+    <script>
+        function aggiungiRiga() {
+            const tabella = document.getElementById('tabellaEsami').getElementsByTagName('tbody')[0];
+            const nuovaRiga = tabella.insertRow();
+            
+            // Cella per nome esame
+            const cellaNome = nuovaRiga.insertCell(0);
+            const inputNome = document.createElement('input');
+            inputNome.type = 'text';
+            inputNome.placeholder = 'Nome esame';
+            cellaNome.appendChild(inputNome);
+            
+            // Cella per CFU
+            const cellaCFU = nuovaRiga.insertCell(1);
+            const inputCFU = document.createElement('input');
+            inputCFU.type = 'number';
+            inputCFU.min = '1';
+            inputCFU.max = '30';
+            inputCFU.placeholder = 'CFU';
+            cellaCFU.appendChild(inputCFU);
+            
+            // Cella per voto
+            const cellaVoto = nuovaRiga.insertCell(2);
+            const inputVoto = document.createElement('input');
+            inputVoto.type = 'number';
+            inputVoto.min = '18';
+            inputVoto.max = '30';
+            inputVoto.placeholder = 'Voto';
+            cellaVoto.appendChild(inputVoto);
+            
+            // Cella per azioni
+            const cellaAzioni = nuovaRiga.insertCell(3);
+            const btnRimuovi = document.createElement('button');
+            btnRimuovi.textContent = 'Rimuovi';
+            btnRimuovi.onclick = function() { rimuoviRiga(this); };
+            cellaAzioni.appendChild(btnRimuovi);
+        }
+        
+        function rimuoviRiga(btn) {
+            const riga = btn.parentNode.parentNode;
+            riga.parentNode.removeChild(riga);
+        }
+        
+        function calcolaMetriche() {
+            const tabella = document.getElementById('tabellaEsami').getElementsByTagName('tbody')[0];
+            const righe = tabella.getElementsByTagName('tr');
+            
+            let esami = [];
+            
+            // Raccolta dati esami
+            for (let i = 0; i < righe.length; i++) {
+                const inputs = righe[i].getElementsByTagName('input');
+                const nome = inputs[0].value.trim();
+                const cfu = parseInt(inputs[1].value);
+                const votoInput = inputs[2].value.trim();
+                
+                // Verifica che ci siano valori validi
+                if (nome && !isNaN(cfu)) {
+                    const voto = votoInput ? parseInt(votoInput) : null;
+                    esami.push({ nome, cfu, voto });
+                }
+            }
+            
+            // Calcola media ponderata normale
+            const mediaPonderata = calcolaMedia(esami);
+            document.getElementById('mediaPonderata').textContent = 
+                mediaPonderata ? mediaPonderata.toFixed(2) : 'Nessun esame con voto';
+            
+            // Calcola media ponderata con sconto
+            const mediaPonderataSconto = calcolaMediaConSconto(esami);
+            document.getElementById('mediaPonderataSconto').textContent = 
+                mediaPonderataSconto ? mediaPonderataSconto.toFixed(2) : 'Nessun esame con voto';
+            
+            // Previsione voto di laurea
+            const previsioneLaurea = mediaPonderataSconto ? (mediaPonderataSconto / 30 * 110).toFixed(2) : '-';
+            document.getElementById('previsioneLaurea').textContent = previsioneLaurea;
+        }
+        
+        function calcolaMedia(esami) {
+            let sommaVotiPesati = 0;
+            let sommaCFU = 0;
+            
+            for (const esame of esami) {
+                if (esame.voto !== null) {
+                    sommaVotiPesati += esame.voto * esame.cfu;
+                    sommaCFU += esame.cfu;
+                }
+            }
+            
+            return sommaCFU > 0 ? sommaVotiPesati / sommaCFU : null;
+        }
+        
+        function calcolaMediaConSconto(esami) {
+            // Se non ci sono abbastanza esami con voto, ritorna null
+            const esamiConVoto = esami.filter(e => e.voto !== null);
+            if (esamiConVoto.length === 0) return null;
+            
+            // Ordina esami per voto (crescente)
+            const esamiOrdinati = [...esamiConVoto].sort((a, b) => a.voto - b.voto);
+            
+            // Trova l'esame con voto più basso
+            const esamePeggiore = esamiOrdinati[0];
+            
+            // Applica lo sconto (riduzione di 5 CFU)
+            let sommaVotiPesati = 0;
+            let sommaCFU = 0;
+            
+            for (const esame of esamiConVoto) {
+                if (esame === esamePeggiore) {
+                    // Applica lo sconto: se l'esame ha meno di 5 CFU, non conta per nulla
+                    const cfuEffettivi = Math.max(0, esame.cfu - 5);
+                    sommaVotiPesati += esame.voto * cfuEffettivi;
+                    sommaCFU += cfuEffettivi;
+                } else {
+                    sommaVotiPesati += esame.voto * esame.cfu;
+                    sommaCFU += esame.cfu;
+                }
+            }
+            
+            return sommaCFU > 0 ? sommaVotiPesati / sommaCFU : null;
+        }
+    </script>
+</body>
+</html>
