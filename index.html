@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>Registro Esami Universitari</title>
+    <!-- Aggiorna il link di Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -21,10 +23,11 @@
             font-size: 28px; 
             margin-bottom: 20px; 
             text-align: center; 
+            margin-top: 0; /* Allinea il nome della pagina in alto */
         }
         table { 
             border-collapse: collapse; 
-            width: 90%; 
+            width: 95%; 
             max-width: 800px; 
             margin: 20px 0; 
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
@@ -51,15 +54,28 @@
             border-radius: 4px; 
         }
         .result-box { 
-            border: 1px solid #ddd; 
+            width: 95%; /* Larga quanto la tabella */
+            max-width: 800px; /* Limite massimo */
+            margin: 20px auto; /* Box centrata */
+            text-align: left; /* Contenuto allineato a sinistra */
             padding: 20px; 
-            margin-top: 20px; 
-            width: 90%; 
-            max-width: 800px; 
+            border: 1px solid #ddd; 
             background-color: #fff; 
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
             border-radius: 8px; 
-            text-align: center; 
+            position: relative; /* Necessario per fissare il titolo */
+            overflow: hidden; /* Evita che il contenuto esca dalla box */
+        }
+        .result-box h3 { 
+            font-size: 1.5em; /* Testo più grande */
+            font-weight: bold; /* Grassetto */
+            margin: 0; /* Rimuove margini extra */
+            position: sticky; /* Fissa il titolo in alto */
+            top: 0; /* Posizione in alto */
+            background-color: #fff; /* Sfondo per evitare sovrapposizioni */
+            padding: 10px; /* Aggiunge padding */
+            z-index: 10; /* Assicura che il titolo sia sopra gli altri elementi */
+            border-bottom: 1px solid #ddd; /* Aggiunge una linea di separazione */
         }
         .result-item { 
             margin: 10px 0; 
@@ -93,9 +109,29 @@
             gap: 10px; 
             margin-bottom: 20px; 
         }
+        .remove-icon { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; /* Centra il cestino nella colonna */
+            color: red; 
+            cursor: pointer; 
+            font-size: 1.2em; 
+            border: none; 
+            background: none; 
+            padding: 0; /* Rimuove padding extra */
+            transition: transform 0.2s ease; /* Aggiunge una transizione per l'ingrandimento */
+        }
+        .remove-icon:hover { 
+            background-color: transparent; /* Rimuove l'effetto hover */
+            transform: scale(1.1); /* Ingrandisce leggermente il pulsante */
+        }
+        td {
+            vertical-align: middle; /* Centra verticalmente il contenuto della cella */
+            text-align: center; /* Centra orizzontalmente il contenuto della cella */
+        }
         @media (max-width: 768px) {
             table { 
-                width: 100%; 
+                width: 95%; 
             }
             th, td { 
                 font-size: 12px; 
@@ -127,7 +163,7 @@
     </style>
 </head>
 <body>
-    <h1>Registro Esami Universitari</h1>
+    <h1>Uni-Tracker</h1>
     
     <div class="button-container">
         <button onclick="aggiungiRiga()">Aggiungi Esame</button>
@@ -148,7 +184,11 @@
                 <td><input type="text" placeholder="Nome esame"></td>
                 <td><input type="number" min="1" max="30" placeholder="CFU"></td>
                 <td><input type="number" min="18" max="30" placeholder="Voto"></td>
-                <td><button onclick="rimuoviRiga(this)">Rimuovi</button></td>
+                <td>
+                    <button class="remove-icon" onclick="rimuoviRiga(this)">
+                        <i class="fas fa-trash-alt"></i> <!-- Icona cestino -->
+                    </button>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -156,8 +196,9 @@
     <div class="result-box">
         <h3>Risultati</h3>
         <div class="result-item">Media Ponderata: <span id="mediaPonderata">-</span></div>
+        <div class="result-item">Previsione Voto di Laurea: <span id="previsioneLaureaMedia">-</span></div>
         <div class="result-item">Media Ponderata (sconto 5 CFU): <span id="mediaPonderataSconto">-</span></div>
-        <div class="result-item">Previsione Voto di Laurea (base 110): <span id="previsioneLaurea">-</span></div>
+        <div class="result-item">Previsione Voto di Laurea (sconto 5 CFU): <span id="previsioneLaurea">-</span></div>
     </div>
 
     <script>
@@ -193,7 +234,8 @@
             // Cella per azioni
             const cellaAzioni = nuovaRiga.insertCell(3);
             const btnRimuovi = document.createElement('button');
-            btnRimuovi.textContent = 'Rimuovi';
+            btnRimuovi.className = 'remove-icon';
+            btnRimuovi.innerHTML = '<i class="fas fa-trash-alt"></i>';
             btnRimuovi.onclick = function() { rimuoviRiga(this); };
             cellaAzioni.appendChild(btnRimuovi);
         }
@@ -233,7 +275,11 @@
             document.getElementById('mediaPonderataSconto').textContent = 
                 mediaPonderataSconto ? mediaPonderataSconto.toFixed(2) : 'Nessun esame con voto';
             
-            // Previsione voto di laurea
+            // Previsione voto di laurea basata sulla media ponderata
+            const previsioneLaureaMedia = mediaPonderata ? (mediaPonderata / 30 * 110).toFixed(2) : '-';
+            document.getElementById('previsioneLaureaMedia').textContent = previsioneLaureaMedia;
+
+            // Previsione voto di laurea basata sulla media ponderata con sconto
             const previsioneLaurea = mediaPonderataSconto ? (mediaPonderataSconto / 30 * 110).toFixed(2) : '-';
             document.getElementById('previsioneLaurea').textContent = previsioneLaurea;
         }
