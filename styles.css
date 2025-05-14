@@ -58,7 +58,7 @@ h1:after {
 
 table {
     width: 100%;
-    max-width: none;
+    max-width: 100%;
     margin: 0 auto;
     background: white;
     border-radius: 10px;
@@ -306,7 +306,8 @@ td {
     opacity: 1;
 }
 
-@media (max-width: 768px) {
+/* Stili per dispositivi con larghezza massima di 768px (tablet e desktop stretti) */
+@media screen and (max-width: 768px) {
     .container {
         padding: 0;
     }
@@ -328,6 +329,8 @@ td {
     }
     button { 
         width: 100%; 
+        font-size: 14px;
+        padding: 12px 24px;
     }
     .target-section,
     .result-box,
@@ -337,21 +340,146 @@ td {
         margin-left: 0;
         margin-right: 0;
     }
+    h1 { 
+        font-size: 24px; 
+    }
+    .result-item,
+    .target-description {
+        font-size: 0.9em;
+    }
 }
 
-@media (max-width: 480px) {
+/* Stili per dispositivi mobili in portrait */
+@media screen and (max-width: 480px) and (orientation: portrait) {
     h1 { 
         font-size: 22px; 
     }
     th, td { 
-        font-size: 10px; 
-        padding: 6px; 
+        font-size: 12px; 
+        padding: 8px; 
+    }
+    td input { 
+        font-size: 12px;
+        padding: 8px 10px;
+        width: 95%;
+    }
+    .button-container button {
+        font-size: 14px;
+        padding: 12px 20px;
+    }
+    .result-item,
+    .target-description {
+        font-size: 0.9em;
+    }
+    .target-voto {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .target-voto input {
+        width: 100%;
+    }
+    .target-voto button {
+        width: 100%;
+    }
+}
+
+/* Stili per dispositivi mobili in landscape */
+@media screen and (max-width: 900px) and (orientation: landscape) {
+    body {
+        padding: 15px 10px;
+    }
+    .container {
+        max-width: 100%;
+    }
+    .content-wrapper {
+        max-width: 100%;
+    }
+    .button-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .button-container button {
+        flex: 1;
+        min-width: calc(50% - 5px);
+        font-size: 14px;
+    }
+    th, td {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0;
+    }
+    .content-wrapper {
+        padding: 15px;
+    }
+    th, td { 
+        font-size: 12px; 
+        padding: 8px; 
+    }
+    .button-container { 
+        flex-direction: column; 
+        gap: 5px;
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
     }
     button { 
-        font-size: 12px; 
+        width: 100%; 
+        font-size: 14px;
+        padding: 12px 24px;
+    }
+    .target-section,
+    .result-box,
+    table,
+    .footer {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    h1 { 
+        font-size: 22px; 
+    }
+    td input { 
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+    .result-item,
+    .target-description {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+    table {
+        width: 95%;
+        margin: 10px auto;
+    }
+    th, td { 
+        font-size: 9px;
+        padding: 5px 2px; 
     }
     .target-description {
-        font-size: 0.85em;
+        font-size: 0.8em;
+    }
+    td input {
+        font-size: 9px;
+        padding: 6px 8px;
+    }
+    .button-container button {
+        font-size: 11px;
+        padding: 10px 20px;
+    }
+    .result-item {
+        font-size: 0.9em;
+        padding: 8px 12px;
     }
 }
 
@@ -369,7 +497,7 @@ td {
     color: #495057;
     margin-bottom: 15px;
     line-height: 1.5;
-    font-size: 0.95em;
+    font-size: 0.9em;
 }
 
 .target-voto {
