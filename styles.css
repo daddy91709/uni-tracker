@@ -351,35 +351,137 @@ td {
 
 /* Stili per dispositivi mobili in portrait */
 @media screen and (max-width: 480px) and (orientation: portrait) {
-    h1 { 
-        font-size: 22px; 
+    .container {
+        padding: 0;
     }
-    th, td { 
-        font-size: 12px; 
-        padding: 8px; 
+    .content-wrapper {
+        padding: 10px;
     }
+    /* Stili tabella ridisegnata per mobile */
+    table {
+        width: 100%;
+        margin: 0;
+        border-radius: 8px;
+        border-spacing: 0;
+        border-collapse: separate;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Header tabella */
+    thead {
+        background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
+    }
+    
+    th { 
+        font-size: 16px;
+        padding: 16px 8px;
+        font-weight: 600;
+        height: auto;
+        text-transform: none;
+        letter-spacing: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Celle tabella */
+    td { 
+        padding: 12px 8px;
+        background: white;
+    }
+    
+    /* Input fields */
     td input { 
-        font-size: 12px;
-        padding: 8px 10px;
-        width: 95%;
+        font-size: 16px;
+        padding: 12px;
+        height: 48px;
+        width: 100%;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        transition: all 0.2s ease;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    td input:focus {
+        border-color: #007BFF;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+    
+    /* Larghezze colonne ottimizzate */
+    th:nth-child(1), td:nth-child(1) { width: 45%; }
+    th:nth-child(2), td:nth-child(2) { width: 17%; }
+    th:nth-child(3), td:nth-child(3) { width: 17%; }
+    th:nth-child(4), td:nth-child(4) { width: 21%; }
+    
+    /* Pulsante rimuovi */
+    .remove-icon {
+        font-size: 22px;
+        width: 48px;
+        height: 48px;
+        min-height: 48px;
+        margin: 0 auto;
+        border-radius: 24px;
+        background: rgba(220, 53, 69, 0.1) !important;
+        color: #dc3545;
+        transition: all 0.2s ease;
+    }
+    
+    .remove-icon:hover {
+        background: rgba(220, 53, 69, 0.2) !important;
+        transform: scale(1.05);
+    }
+    
+    .remove-icon:active {
+        transform: scale(0.95);
+    }
+    
+    /* Effetti riga */
+    tr:last-child td:first-child {
+        border-bottom-left-radius: 8px;
+    }
+    
+    tr:last-child td:last-child {
+        border-bottom-right-radius: 8px;
+    }
+    
+    tr:hover td {
+        background-color: #f8f9fa;
+    }
+    
+    /* Bordi celle */
+    td {
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    tr:last-child td {
+        border-bottom: none;
+    }
+    
+    /* Rimuovo separatori verticali header */
+    th:not(:last-child):after {
+        display: none;
+    }
+    
+    /* Altri stili mobile rimangono invariati */
+    .target-description {
+        font-size: 0.8em;
     }
     .button-container button {
-        font-size: 14px;
-        padding: 12px 20px;
+        font-size: 11px;
+        padding: 10px 20px;
     }
-    .result-item,
-    .target-description {
+    .result-item {
         font-size: 0.9em;
+        padding: 8px 12px;
     }
-    .target-voto {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .target-voto input {
+    .target-section,
+    .result-box,
+    .footer,
+    .button-container {
         width: 100%;
-    }
-    .target-voto button {
-        width: 100%;
+        margin: 0;
+        border-radius: 8px;
     }
 }
 

@@ -128,8 +128,8 @@ function prevediVoti() {
     const votoTarget = parseFloat(document.getElementById('votoTarget').value);
     const messaggioImpossibile = document.getElementById('messaggioImpossibile');
     
-    if (!votoTarget || votoTarget < 66 || votoTarget > 110) {
-        alert('Inserisci un voto target valido (60-113)');
+    if (!votoTarget || votoTarget < 60 || votoTarget > 110) {
+        alert('Inserisci un voto target valido (60-110)');
         return;
     }
 
