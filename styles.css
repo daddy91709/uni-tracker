@@ -350,6 +350,9 @@ td {
     button { 
         font-size: 12px; 
     }
+    .target-description {
+        font-size: 0.85em;
+    }
 }
 
 .target-section {
