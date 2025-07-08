@@ -279,15 +279,30 @@ function importaEsami(input) {
 }
 
 function importaExcel(file) {
+    // Debug per GitHub Pages
+    console.log('File selezionato:', file.name, 'Tipo:', file.type, 'Dimensione:', file.size);
+    
+    // Controlla se XLSX è disponibile
+    if (typeof XLSX === 'undefined') {
+        alert('Errore: Libreria XLSX non caricata. Ricarica la pagina e riprova.');
+        return;
+    }
+    
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
+            console.log('FileReader completato. Dimensione buffer:', e.target.result.byteLength);
+            
             const data = new Uint8Array(e.target.result);
+            console.log('Primi 10 bytes del file:', Array.from(data.slice(0, 10)));
+            
             const workbook = XLSX.read(data, { type: 'array' });
+            console.log('Workbook caricato. Fogli disponibili:', workbook.SheetNames);
             
             // Prendi il primo foglio
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
+            console.log('Foglio selezionato:', firstSheetName);
             
             // Converti in JSON
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
@@ -296,14 +311,23 @@ function importaExcel(file) {
                 blankrows: false
             });
             
+            console.log('Dati convertiti in JSON. Righe trovate:', jsonData.length);
+            
             // Processa i dati
             processaEsamiExcel(jsonData);
             
         } catch (error) {
-            console.error('Errore nella lettura del file Excel:', error);
-            alert('Errore nella lettura del file Excel. Assicurati che sia un file valido dall\'università.');
+            console.error('Errore dettagliato nella lettura del file Excel:', error);
+            console.error('Stack trace:', error.stack);
+            alert(`Errore nella lettura del file Excel: ${error.message}\nControlla la console per dettagli.`);
         }
     };
+    
+    reader.onerror = function(error) {
+        console.error('Errore FileReader:', error);
+        alert('Errore nella lettura del file. Assicurati che sia un file Excel valido.');
+    };
+    
     reader.readAsArrayBuffer(file);
 }
 
@@ -574,3 +598,29 @@ function importaTesto(file) {
     };
     reader.readAsText(file);
 }
+
+// Verifica compatibilità e librerie al caricamento della pagina
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Pagina caricata. Verificando librerie...');
+    
+    // Verifica se XLSX è caricato
+    if (typeof XLSX === 'undefined') {
+        console.error('XLSX non è caricato!');
+        document.body.insertAdjacentHTML('afterbegin', 
+            '<div style="background: #ff6b6b; color: white; padding: 10px; text-align: center; font-weight: bold;">' +
+            'ATTENZIONE: Libreria Excel non caricata. Ricarica la pagina.' +
+            '</div>'
+        );
+    } else {
+        console.log('XLSX caricato correttamente. Versione:', XLSX.version);
+    }
+    
+    // Verifica se FileReader è supportato
+    if (!window.FileReader) {
+        console.error('FileReader non supportato!');
+        alert('Il tuo browser non supporta la lettura di file. Aggiorna il browser.');
+    }
+    
+    console.log('User Agent:', navigator.userAgent);
+    console.log('URL corrente:', window.location.href);
+});

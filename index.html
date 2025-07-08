@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Font Awesome -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
-    <!-- SheetJS per leggere file Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- SheetJS per leggere file Excel - versione più recente e stabile -->
+    <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Fallback CDN per SheetJS -->
+    <script>
+        if (typeof XLSX === 'undefined') {
+            console.log('Caricamento fallback SheetJS...');
+            document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>');
+        }
+    </script>
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
     <!-- JavaScript -->
