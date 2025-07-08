@@ -23,7 +23,7 @@ function aggiungiRiga() {
     const inputVoto = document.createElement('input');
     inputVoto.type = 'number';
     inputVoto.min = '18';
-    inputVoto.max = '30';
+    inputVoto.max = '31';
     inputVoto.placeholder = 'Voto';
     cellaVoto.appendChild(inputVoto);
     
@@ -267,6 +267,239 @@ function importaEsami(input) {
     const file = input.files[0];
     if (!file) return;
 
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    
+    if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+        importaExcel(file);
+    } else if (fileExtension === 'txt') {
+        importaTesto(file);
+    } else {
+        alert('Formato file non supportato. Usa file .txt, .xlsx o .xls');
+    }
+}
+
+function importaExcel(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            
+            // Prendi il primo foglio
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // Converti in JSON
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
+                header: 1,
+                defval: '',
+                blankrows: false
+            });
+            
+            // Processa i dati
+            processaEsamiExcel(jsonData);
+            
+        } catch (error) {
+            console.error('Errore nella lettura del file Excel:', error);
+            alert('Errore nella lettura del file Excel. Assicurati che sia un file valido dall\'università.');
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function processaEsamiExcel(data) {
+    if (!data || data.length === 0) {
+        alert('Il file Excel sembra vuoto o non contiene dati validi.');
+        return;
+    }
+    
+    // Trova la riga di intestazione (cerca una riga con almeno 6 colonne)
+    let headerIndex = -1;
+    let header = null;
+    
+    for (let i = 0; i < Math.min(data.length, 10); i++) {
+        const riga = data[i];
+        if (riga && riga.length > 5) {
+            header = riga;
+            headerIndex = i;
+            break;
+        }
+    }
+    
+    if (!header || header.length < 5) {
+        alert('Non riesco a trovare una riga di intestazione valida nel file Excel. Assicurati che il file contenga i dati degli esami esportati dall\'università.');
+        return;
+    }
+    
+    // Ricerca delle colonne necessarie
+    const indiceEsame = header.findIndex(col => {
+        if (!col) return false;
+        const colLower = col.toString().toLowerCase().trim();
+        return colLower.includes('esame') || 
+               colLower.includes('materia') || 
+               colLower.includes('corso') ||
+               colLower.includes('denominazione') ||
+               colLower.includes('nome');
+    });
+    
+    const indiceCrediti = header.findIndex(col => {
+        if (!col) return false;
+        const colLower = col.toString().toLowerCase().trim();
+        return (colLower.includes('crediti') || colLower.includes('cfu')) && 
+               !colLower.includes('per') && 
+               !colLower.includes('media');
+    });
+    
+    const indiceVoto = header.findIndex(col => {
+        if (!col) return false;
+        const colLower = col.toString().toLowerCase().trim();
+        return colLower === 'voto' || colLower.includes('voto');
+    });
+    
+    const indiceLode = header.findIndex(col => {
+        if (!col) return false;
+        const colLower = col.toString().toLowerCase().trim();
+        return colLower.includes('lode');
+    });
+    
+    // Se non trova le colonne per nome, usa le posizioni standard del file universitario
+    const indiceEsameFinal = indiceEsame !== -1 ? indiceEsame : 4;      // Colonna "Esame"
+    const indiceCreditiFinal = indiceCrediti !== -1 ? indiceCrediti : 6; // Colonna "Crediti"
+    const indiceVotoFinal = indiceVoto !== -1 ? indiceVoto : 8;          // Colonna "Voto"
+    const indiceLodeFinal = indiceLode !== -1 ? indiceLode : 9;          // Colonna "Lode"
+    
+    // Pulisci la tabella esistente
+    const tabella = document.getElementById('tabellaEsami').getElementsByTagName('tbody')[0];
+    while (tabella.rows.length > 1) {
+        tabella.deleteRow(1);
+    }
+    
+    // Pulisci la prima riga
+    const primaRiga = tabella.rows[0].getElementsByTagName('input');
+    primaRiga[0].value = '';
+    primaRiga[1].value = '';
+    primaRiga[2].value = '';
+    
+    let primaRigaUsata = false;
+    let esamiImportati = 0;
+    
+    // Processa ogni riga di dati (salta l'header)
+    for (let i = headerIndex + 1; i < data.length; i++) {
+        const riga = data[i];
+        
+        if (!riga || riga.length === 0) continue;
+        
+        const nomeEsame = riga[indiceEsameFinal];
+        const crediti = parseInt(riga[indiceCreditiFinal]);
+        const voto = riga[indiceVotoFinal];
+        const lode = indiceLodeFinal !== -1 ? riga[indiceLodeFinal] : null;
+        
+        // Salta se non c'è nome esame o se sono solo 1 CFU (idoneità)
+        if (!nomeEsame || crediti <= 1 || isNaN(crediti)) {
+            continue;
+        }
+        
+        // Converti il voto se presente
+        let votoNumerico = null;
+        if (voto && voto !== '' && !isNaN(parseInt(voto))) {
+            votoNumerico = parseInt(voto);
+            
+            // Se il voto è 30 e c'è la lode, converti a 31
+            if (votoNumerico === 30 && lode && lode.toString().toLowerCase() === 'si') {
+                votoNumerico = 31;
+            }
+        }
+        
+        // Salta gli esami senza voto (voto nullo o vuoto)
+        if (votoNumerico === null || votoNumerico === 0) {
+            continue;
+        }
+        
+        // Pulisci il nome dell'esame e convertilo in maiuscolo
+        const nomeEsamePulito = pulisciNomeEsame(nomeEsame).toUpperCase();
+        
+        if (!primaRigaUsata) {
+            // Usa la prima riga esistente
+            primaRiga[0].value = nomeEsamePulito;
+            primaRiga[1].value = crediti;
+            primaRiga[2].value = votoNumerico;
+            primaRigaUsata = true;
+        } else {
+            // Crea una nuova riga
+            const nuovaRiga = tabella.insertRow();
+            
+            const cellaNome = nuovaRiga.insertCell(0);
+            const inputNome = document.createElement('input');
+            inputNome.type = 'text';
+            inputNome.placeholder = 'Nome esame';
+            inputNome.value = nomeEsamePulito;
+            cellaNome.appendChild(inputNome);
+            
+            const cellaCFU = nuovaRiga.insertCell(1);
+            const inputCFU = document.createElement('input');
+            inputCFU.type = 'number';
+            inputCFU.min = '1';
+            inputCFU.max = '30';
+            inputCFU.placeholder = 'CFU';
+            inputCFU.value = crediti;
+            cellaCFU.appendChild(inputCFU);
+            
+            const cellaVoto = nuovaRiga.insertCell(2);
+            const inputVoto = document.createElement('input');
+            inputVoto.type = 'number';
+            inputVoto.min = '18';
+            inputVoto.max = '31';
+            inputVoto.placeholder = 'Voto';
+            inputVoto.value = votoNumerico;
+            cellaVoto.appendChild(inputVoto);
+            
+            const cellaAzioni = nuovaRiga.insertCell(3);
+            const btnRimuovi = document.createElement('button');
+            btnRimuovi.className = 'remove-icon';
+            btnRimuovi.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            btnRimuovi.onclick = function() { rimuoviRiga(this); };
+            cellaAzioni.appendChild(btnRimuovi);
+        }
+        
+        esamiImportati++;
+    }
+    
+    // Aggiorna i calcoli
+    calcolaMetriche();
+    
+    // Resetta l'input file
+    document.getElementById('inputFile').value = '';
+    
+    // Mostra notifica di successo
+    mostraNotifica(`${esamiImportati} esami importati con successo dal file Excel!`);
+}
+
+function pulisciNomeEsame(nomeCompleto) {
+    if (!nomeCompleto) return '';
+    
+    // Rimuovi informazioni sui CFU e codici del corso
+    let nome = nomeCompleto.toString();
+    
+    // Rimuovi pattern come "X cfu in Y - CODICE"
+    nome = nome.replace(/\s+\d+\s+cfu\s+in\s+[A-Z]\s+-\s+[A-Z-\/\d]+.*$/i, '');
+    
+    // Rimuovi pattern come "- C11" alla fine
+    nome = nome.replace(/\s+-\s+C\d+$/i, '');
+    
+    // Capitalizza correttamente
+    nome = nome.split(' ')
+        .map(word => {
+            if (word.length <= 3 && word.match(/^[A-Z]+$/)) {
+                return word; // Mantieni acronimi in maiuscolo
+            }
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join(' ');
+    
+    return nome.trim();
+}
+
+function importaTesto(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
         const contenuto = e.target.result;
@@ -316,7 +549,7 @@ function importaEsami(input) {
                 const inputVoto = document.createElement('input');
                 inputVoto.type = 'number';
                 inputVoto.min = '18';
-                inputVoto.max = '30';
+                inputVoto.max = '31';
                 inputVoto.placeholder = 'Voto';
                 inputVoto.value = voto || '';
                 cellaVoto.appendChild(inputVoto);
@@ -328,11 +561,13 @@ function importaEsami(input) {
                 btnRimuovi.onclick = function() { rimuoviRiga(this); };
                 cellaAzioni.appendChild(btnRimuovi);
             }
-        });        // Aggiorna i calcoli
+        });
+
+        // Aggiorna i calcoli
         calcolaMetriche();
         
         // Resetta l'input file
-        input.value = '';
+        document.getElementById('inputFile').value = '';
         
         // Mostra notifica di successo
         mostraNotifica('Dati importati con successo!');

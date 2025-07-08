@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Font Awesome -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
+    <!-- SheetJS per leggere file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
     <!-- JavaScript -->
@@ -21,10 +23,10 @@
         <button onclick="esportaEsami()" title="Salva gli esami in un file di testo">
             <i class="fas fa-download"></i> Esporta
         </button>
-        <button onclick="document.getElementById('inputFile').click()" title="Carica esami da un file di testo">
+        <button onclick="document.getElementById('inputFile').click()" title="Carica esami da file di testo (.txt) o Excel (.xlsx/.xls) dell'università">
             <i class="fas fa-upload"></i> Importa
         </button>
-        <input type="file" id="inputFile" style="display: none" onchange="importaEsami(this)" accept=".txt">
+        <input type="file" id="inputFile" style="display: none" onchange="importaEsami(this)" accept=".txt,.xlsx,.xls">
     </div>
     
     <table id="tabellaEsami">
@@ -40,7 +42,7 @@
             <tr>
                 <td><input type="text" placeholder="Nome esame"></td>
                 <td><input type="number" min="1" max="30" placeholder="CFU"></td>
-                <td><input type="number" min="18" max="32" placeholder="Voto"></td>
+                <td><input type="number" min="18" max="31" placeholder="Voto"></td>
                 <td>
                     <button class="remove-icon" onclick="rimuoviRiga(this)">
                         <i class="fas fa-trash-alt"></i> <!-- Icona cestino -->
