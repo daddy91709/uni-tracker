@@ -36,6 +36,28 @@
         <input type="file" id="inputFile" style="display: none" onchange="importaEsami(this)" accept=".txt,.xlsx,.xls">
     </div>
     
+    <!-- Nuova sezione per gestione LocalStorage -->
+    <div class="storage-container">
+        <div class="storage-info">
+            <i class="fas fa-save"></i>
+            <span>I tuoi dati vengono salvati automaticamente nel browser</span>
+        </div>
+        <div class="storage-buttons">
+            <button onclick="salvaInLocalStorage(); mostraNotifica('Dati salvati manualmente nel browser!', 'successo')" title="Salva manualmente i dati nel browser">
+                <i class="fas fa-save"></i> Salva
+            </button>
+            <button onclick="caricaDaLocalStorage()" title="Ricarica i dati salvati nel browser">
+                <i class="fas fa-sync-alt"></i> Ricarica
+            </button>
+            <button onclick="mostraInfoLocalStorage()" title="Visualizza informazioni sui dati salvati">
+                <i class="fas fa-info-circle"></i> Info
+            </button>
+            <button onclick="cancellaLocalStorage()" title="Cancella tutti i dati salvati nel browser" class="btn-danger">
+                <i class="fas fa-trash"></i> Cancella
+            </button>
+        </div>
+    </div>
+    
     <table id="tabellaEsami">
         <thead>
             <tr>
@@ -61,8 +83,19 @@
       <div class="target-section">
         <p class="target-description">
             Inserisci il voto di laurea che vorresti ottenere (60-110) per vedere quali voti minimi dovresti prendere negli esami mancanti (quelli per cui non hai inserito il voto).
-            Il calcolo tiene conto dello sconto di 5 CFU sull'esame peggiore.
         </p>
+        
+        <!-- Toggle per scegliere il tipo di calcolo -->
+        <div class="toggle-container">
+            <label class="toggle-label">
+                <input type="checkbox" id="toggleSconto" checked onchange="aggiornaDescrizioneToggle()">
+                <span class="toggle-slider"></span>
+                <span class="toggle-text" id="toggleDescription">
+                    Calcola con sconto 5 CFU sull'esame peggiore
+                </span>
+            </label>
+        </div>
+        
         <div class="target-voto">
             <input type="number" id="votoTarget" min="60" max="110" placeholder="Voto target" />
             <button onclick="prevediVoti()">Prevedi Voti</button>

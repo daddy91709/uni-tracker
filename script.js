@@ -7,6 +7,7 @@ function aggiungiRiga() {
     const inputNome = document.createElement('input');
     inputNome.type = 'text';
     inputNome.placeholder = 'Nome esame';
+    inputNome.addEventListener('change', salvaInLocalStorage);
     cellaNome.appendChild(inputNome);
     
     // Cella per CFU
@@ -16,6 +17,7 @@ function aggiungiRiga() {
     inputCFU.min = '1';
     inputCFU.max = '30';
     inputCFU.placeholder = 'CFU';
+    inputCFU.addEventListener('change', salvaInLocalStorage);
     cellaCFU.appendChild(inputCFU);
     
     // Cella per voto
@@ -25,6 +27,7 @@ function aggiungiRiga() {
     inputVoto.min = '18';
     inputVoto.max = '31';
     inputVoto.placeholder = 'Voto';
+    inputVoto.addEventListener('change', salvaInLocalStorage);
     cellaVoto.appendChild(inputVoto);
     
     // Cella per azioni
@@ -34,11 +37,17 @@ function aggiungiRiga() {
     btnRimuovi.innerHTML = '<i class="fas fa-trash-alt"></i>';
     btnRimuovi.onclick = function() { rimuoviRiga(this); };
     cellaAzioni.appendChild(btnRimuovi);
+    
+    // Salva in LocalStorage dopo aver aggiunto la riga
+    salvaInLocalStorage();
 }
 
 function rimuoviRiga(btn) {
     const riga = btn.parentNode.parentNode;
     riga.parentNode.removeChild(riga);
+    
+    // Salva in LocalStorage dopo la rimozione
+    salvaInLocalStorage();
 }
 
 function calcolaMetriche() {
@@ -78,6 +87,9 @@ function calcolaMetriche() {
     // Previsione voto di laurea basata sulla media ponderata con sconto
     const previsioneLaurea = mediaPonderataSconto ? (mediaPonderataSconto / 30 * 110).toFixed(2) : '-';
     document.getElementById('previsioneLaurea').textContent = previsioneLaurea;
+    
+    // Salva in LocalStorage dopo il calcolo
+    salvaInLocalStorage();
 }
 
 function calcolaMedia(esami) {
@@ -127,6 +139,7 @@ function calcolaMediaConSconto(esami) {
 function prevediVoti() {
     const votoTarget = parseFloat(document.getElementById('votoTarget').value);
     const messaggioImpossibile = document.getElementById('messaggioImpossibile');
+    const usaSconto = document.getElementById('toggleSconto').checked;
     
     if (!votoTarget || votoTarget < 60 || votoTarget > 110) {
         alert('Inserisci un voto target valido (60-110)');
@@ -160,7 +173,8 @@ function prevediVoti() {
     for (const esame of esamiDaCompletare) {
         esamiMax.push({ nome: "", cfu: esame.cfu, voto: 31 });
     }
-    const mediaMax = calcolaMediaConSconto(esamiMax);
+    // Usa la funzione appropriata in base al toggle
+    const mediaMax = usaSconto ? calcolaMediaConSconto(esamiMax) : calcolaMedia(esamiMax);
     const previsioneMax = mediaMax ? (mediaMax / 30 * 110) : 0;
 
     if (previsioneMax < votoTarget) {
@@ -177,8 +191,9 @@ function prevediVoti() {
         esamiDaCompletare.forEach((esame, index) => {
             esamiProvvisori.push({ nome: "", cfu: esame.cfu, voto: voti[index] });
         });
-        const mediaConSconto = calcolaMediaConSconto(esamiProvvisori);
-        return mediaConSconto ? (mediaConSconto / 30 * 110) : 0;
+        // Usa la funzione appropriata in base al toggle
+        const media = usaSconto ? calcolaMediaConSconto(esamiProvvisori) : calcolaMedia(esamiProvvisori);
+        return media ? (media / 30 * 110) : 0;
     };
 
     // Ottimizza ogni voto individualmente
@@ -457,6 +472,7 @@ function processaEsamiExcel(data) {
             inputNome.type = 'text';
             inputNome.placeholder = 'Nome esame';
             inputNome.value = nomeEsamePulito;
+            inputNome.addEventListener('change', salvaInLocalStorage);
             cellaNome.appendChild(inputNome);
             
             const cellaCFU = nuovaRiga.insertCell(1);
@@ -466,6 +482,7 @@ function processaEsamiExcel(data) {
             inputCFU.max = '30';
             inputCFU.placeholder = 'CFU';
             inputCFU.value = crediti;
+            inputCFU.addEventListener('change', salvaInLocalStorage);
             cellaCFU.appendChild(inputCFU);
             
             const cellaVoto = nuovaRiga.insertCell(2);
@@ -475,6 +492,7 @@ function processaEsamiExcel(data) {
             inputVoto.max = '31';
             inputVoto.placeholder = 'Voto';
             inputVoto.value = votoNumerico;
+            inputVoto.addEventListener('change', salvaInLocalStorage);
             cellaVoto.appendChild(inputVoto);
             
             const cellaAzioni = nuovaRiga.insertCell(3);
@@ -496,6 +514,9 @@ function processaEsamiExcel(data) {
     
     // Mostra notifica di successo
     mostraNotifica(`${esamiImportati} esami importati con successo dal file Excel!`);
+    
+    // Salva in LocalStorage dopo l'importazione
+    salvaInLocalStorage();
 }
 
 function pulisciNomeEsame(nomeCompleto) {
@@ -558,6 +579,7 @@ function importaTesto(file) {
                 inputNome.type = 'text';
                 inputNome.placeholder = 'Nome esame';
                 inputNome.value = nome || '';
+                inputNome.addEventListener('change', salvaInLocalStorage);
                 cellaNome.appendChild(inputNome);
                 
                 const cellaCFU = nuovaRiga.insertCell(1);
@@ -567,6 +589,7 @@ function importaTesto(file) {
                 inputCFU.max = '30';
                 inputCFU.placeholder = 'CFU';
                 inputCFU.value = cfu || '';
+                inputCFU.addEventListener('change', salvaInLocalStorage);
                 cellaCFU.appendChild(inputCFU);
                 
                 const cellaVoto = nuovaRiga.insertCell(2);
@@ -576,6 +599,7 @@ function importaTesto(file) {
                 inputVoto.max = '31';
                 inputVoto.placeholder = 'Voto';
                 inputVoto.value = voto || '';
+                inputVoto.addEventListener('change', salvaInLocalStorage);
                 cellaVoto.appendChild(inputVoto);
                 
                 const cellaAzioni = nuovaRiga.insertCell(3);
@@ -595,8 +619,179 @@ function importaTesto(file) {
         
         // Mostra notifica di successo
         mostraNotifica('Dati importati con successo!');
+        
+        // Salva in LocalStorage dopo l'importazione
+        salvaInLocalStorage();
     };
     reader.readAsText(file);
+}
+
+// ===== FUNZIONI LOCALSTORAGE =====
+
+function salvaInLocalStorage() {
+    const tabella = document.getElementById('tabellaEsami').getElementsByTagName('tbody')[0];
+    const righe = tabella.getElementsByTagName('tr');
+    let esami = [];
+    
+    // Raccogli tutti gli esami dalla tabella
+    for (let i = 0; i < righe.length; i++) {
+        const inputs = righe[i].getElementsByTagName('input');
+        const nome = inputs[0].value.trim();
+        const cfu = inputs[1].value.trim();
+        const voto = inputs[2].value.trim();
+        
+        // Salva anche le righe vuote per mantenere la struttura
+        esami.push({ nome, cfu, voto });
+    }
+    
+    try {
+        localStorage.setItem('uni-tracker-esami', JSON.stringify(esami));
+        localStorage.setItem('uni-tracker-last-save', new Date().toISOString());
+        console.log('Dati salvati in LocalStorage:', esami.length, 'righe');
+        return true;
+    } catch (error) {
+        console.error('Errore nel salvataggio in LocalStorage:', error);
+        return false;
+    }
+}
+
+function caricaDaLocalStorage() {
+    try {
+        const datiSalvati = localStorage.getItem('uni-tracker-esami');
+        if (!datiSalvati) {
+            console.log('Nessun dato salvato in LocalStorage');
+            return false;
+        }
+        
+        const esami = JSON.parse(datiSalvati);
+        const lastSave = localStorage.getItem('uni-tracker-last-save');
+        
+        console.log('Caricamento da LocalStorage:', esami.length, 'righe');
+        if (lastSave) {
+            console.log('Ultimo salvataggio:', new Date(lastSave).toLocaleString());
+        }
+        
+        const tabella = document.getElementById('tabellaEsami').getElementsByTagName('tbody')[0];
+        
+        // Rimuovi tutte le righe esistenti
+        while (tabella.rows.length > 0) {
+            tabella.deleteRow(0);
+        }
+        
+        // Se non ci sono esami salvati, crea una riga vuota
+        if (esami.length === 0) {
+            aggiungiRiga();
+            return true;
+        }
+        
+        // Ricrea le righe con i dati salvati
+        esami.forEach((esame, index) => {
+            const nuovaRiga = tabella.insertRow();
+            
+            // Cella nome
+            const cellaNome = nuovaRiga.insertCell(0);
+            const inputNome = document.createElement('input');
+            inputNome.type = 'text';
+            inputNome.placeholder = 'Nome esame';
+            inputNome.value = esame.nome || '';
+            inputNome.addEventListener('change', salvaInLocalStorage);
+            cellaNome.appendChild(inputNome);
+            
+            // Cella CFU
+            const cellaCFU = nuovaRiga.insertCell(1);
+            const inputCFU = document.createElement('input');
+            inputCFU.type = 'number';
+            inputCFU.min = '1';
+            inputCFU.max = '30';
+            inputCFU.placeholder = 'CFU';
+            inputCFU.value = esame.cfu || '';
+            inputCFU.addEventListener('change', salvaInLocalStorage);
+            cellaCFU.appendChild(inputCFU);
+            
+            // Cella Voto
+            const cellaVoto = nuovaRiga.insertCell(2);
+            const inputVoto = document.createElement('input');
+            inputVoto.type = 'number';
+            inputVoto.min = '18';
+            inputVoto.max = '31';
+            inputVoto.placeholder = 'Voto';
+            inputVoto.value = esame.voto || '';
+            inputVoto.addEventListener('change', salvaInLocalStorage);
+            cellaVoto.appendChild(inputVoto);
+            
+            // Cella Azioni
+            const cellaAzioni = nuovaRiga.insertCell(3);
+            const btnRimuovi = document.createElement('button');
+            btnRimuovi.className = 'remove-icon';
+            btnRimuovi.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            btnRimuovi.onclick = function() { rimuoviRiga(this); };
+            cellaAzioni.appendChild(btnRimuovi);
+        });
+        
+        // Ricalcola le metriche dopo il caricamento
+        calcolaMetriche();
+        
+        mostraNotifica('Dati caricati dal browser!', 'successo');
+        return true;
+        
+    } catch (error) {
+        console.error('Errore nel caricamento da LocalStorage:', error);
+        return false;
+    }
+}
+
+function cancellaLocalStorage() {
+    if (confirm('Sei sicuro di voler cancellare tutti i dati salvati nel browser?')) {
+        try {
+            localStorage.removeItem('uni-tracker-esami');
+            localStorage.removeItem('uni-tracker-last-save');
+            console.log('LocalStorage cancellato');
+            mostraNotifica('Dati cancellati dal browser!', 'successo');
+            
+            // Ricarica la pagina per resettare tutto
+            setTimeout(() => location.reload(), 1000);
+        } catch (error) {
+            console.error('Errore nella cancellazione del LocalStorage:', error);
+            alert('Errore nella cancellazione dei dati.');
+        }
+    }
+}
+
+function mostraInfoLocalStorage() {
+    try {
+        const datiSalvati = localStorage.getItem('uni-tracker-esami');
+        const lastSave = localStorage.getItem('uni-tracker-last-save');
+        
+        if (!datiSalvati) {
+            alert('Nessun dato salvato nel browser.');
+            return;
+        }
+        
+        const esami = JSON.parse(datiSalvati);
+        const esamiConDati = esami.filter(e => e.nome || e.cfu || e.voto);
+        const dataUltimoSalvataggio = lastSave ? new Date(lastSave).toLocaleString('it-IT') : 'Sconosciuto';
+        
+        alert(
+            `📊 Informazioni dati salvati:\n\n` +
+            `• Righe totali: ${esami.length}\n` +
+            `• Esami con dati: ${esamiConDati.length}\n` +
+            `• Ultimo salvataggio: ${dataUltimoSalvataggio}`
+        );
+    } catch (error) {
+        console.error('Errore nel recupero info LocalStorage:', error);
+        alert('Errore nel recupero delle informazioni.');
+    }
+}
+
+function aggiornaDescrizioneToggle() {
+    const toggle = document.getElementById('toggleSconto');
+    const description = document.getElementById('toggleDescription');
+    
+    if (toggle.checked) {
+        description.innerHTML = '<i class="fas fa-percentage"></i> Calcola con sconto 5 CFU sull\'esame peggiore';
+    } else {
+        description.innerHTML = '<i class="fas fa-calculator"></i> Calcola con media ponderata normale';
+    }
 }
 
 // Verifica compatibilità e librerie al caricamento della pagina
@@ -623,4 +818,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('User Agent:', navigator.userAgent);
     console.log('URL corrente:', window.location.href);
+    
+    // Carica automaticamente i dati salvati
+    setTimeout(() => {
+        const caricato = caricaDaLocalStorage();
+        if (caricato) {
+            console.log('Dati caricati automaticamente da LocalStorage');
+        }
+        // Imposta l'icona corretta del toggle all'avvio
+        aggiornaDescrizioneToggle();
+    }, 100);
 });
