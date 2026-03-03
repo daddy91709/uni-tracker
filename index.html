@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Registro Esami Universitari</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Font Awesome -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
+        crossorigin="anonymous"></script>
     <!-- SheetJS per leggere file Excel - versione più recente e stabile -->
     <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Fallback CDN per SheetJS -->
@@ -14,107 +16,139 @@
             document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>');
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
     <!-- JavaScript -->
     <script src="script.js"></script>
 </head>
+
 <body>
     <div id="notifica" class="notifica"></div>
     <div class="container">
         <h1>Uni-Tracker</h1>
-        
-        <div class="content-wrapper">    <div class="button-container">
-        <button onclick="aggiungiRiga()">Aggiungi Esame</button>
-        <button onclick="calcolaMetriche()">Calcola Medie</button>
-        <button onclick="esportaEsami()" title="Salva gli esami in un file di testo">
-            <i class="fas fa-download"></i> Esporta
-        </button>
-        <button onclick="document.getElementById('inputFile').click()" title="Carica esami da file di testo (.txt) o Excel (.xlsx/.xls) dell'università">
-            <i class="fas fa-upload"></i> Importa
-        </button>
-        <input type="file" id="inputFile" style="display: none" onchange="importaEsami(this)" accept=".txt,.xlsx,.xls">
-    </div>
-    
-    <!-- Nuova sezione per gestione LocalStorage -->
-    <div class="storage-container">
-        <div class="storage-info">
-            <i class="fas fa-save"></i>
-            <span>I tuoi dati vengono salvati automaticamente nel browser</span>
-        </div>
-        <div class="storage-buttons">
-            <button onclick="salvaInLocalStorage(); mostraNotifica('Dati salvati manualmente nel browser!', 'successo')" title="Salva manualmente i dati nel browser">
-                <i class="fas fa-save"></i> Salva
-            </button>
-            <button onclick="caricaDaLocalStorage()" title="Ricarica i dati salvati nel browser">
-                <i class="fas fa-sync-alt"></i> Ricarica
-            </button>
-            <button onclick="mostraInfoLocalStorage()" title="Visualizza informazioni sui dati salvati">
-                <i class="fas fa-info-circle"></i> Info
-            </button>
-            <button onclick="cancellaLocalStorage()" title="Cancella tutti i dati salvati nel browser" class="btn-danger">
-                <i class="fas fa-trash"></i> Cancella
-            </button>
-        </div>
-    </div>
-    
-    <table id="tabellaEsami">
-        <thead>
-            <tr>
-                <th>Nome Esame</th>
-                <th>CFU</th>
-                <th>Voto</th>
-                <th>Azioni</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><input type="text" placeholder="Nome esame"></td>
-                <td><input type="number" min="1" max="30" placeholder="CFU"></td>
-                <td><input type="number" min="18" max="31" placeholder="Voto"></td>
-                <td>
-                    <button class="remove-icon" onclick="rimuoviRiga(this)">
-                        <i class="fas fa-trash-alt"></i> <!-- Icona cestino -->
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-      <div class="target-section">
-        <p class="target-description">
-            Inserisci il voto di laurea che vorresti ottenere (60-110) per vedere quali voti minimi dovresti prendere negli esami mancanti (quelli per cui non hai inserito il voto).
-        </p>
-        
-        <!-- Toggle per scegliere il tipo di calcolo -->
-        <div class="toggle-container">
-            <label class="toggle-label">
-                <input type="checkbox" id="toggleSconto" checked onchange="aggiornaDescrizioneToggle()">
-                <span class="toggle-slider"></span>
-                <span class="toggle-text" id="toggleDescription">
-                    Calcola con sconto 5 CFU sull'esame peggiore
-                </span>
-            </label>
-        </div>
-        
-        <div class="target-voto">
-            <input type="number" id="votoTarget" min="60" max="110" placeholder="Voto target" />
-            <button onclick="prevediVoti()">Prevedi Voti</button>
-        </div>
-        <div id="messaggioImpossibile" class="messaggio-impossibile" style="display: none;">
-            Purtroppo è impossibile raggiungere questo voto target.
-        </div>
-    </div>
 
-    <div class="result-box">
-        <h3>Risultati</h3>
-        <div class="result-item">Media Ponderata: <span id="mediaPonderata">-</span></div>
-        <div class="result-item">Previsione Voto di Laurea: <span id="previsioneLaureaMedia">-</span></div>
-        <div class="result-item">Media Ponderata (sconto 5 CFU): <span id="mediaPonderataSconto">-</span></div>
-        <div class="result-item">Previsione Voto di Laurea (sconto 5 CFU): <span id="previsioneLaurea">-</span></div>
-    </div><div class="footer">
+        <div class="content-wrapper">
+            <div class="button-container">
+                <button class="btn-secondary" onclick="esportaEsami()" title="Salva gli esami in un file di testo">
+                    <i class="fas fa-download"></i> Esporta
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('inputFile').click()"
+                    title="Carica esami da file di testo (.txt) o Excel (.xlsx/.xls) dell'università">
+                    <i class="fas fa-upload"></i> Importa
+                </button>
+                <input type="file" id="inputFile" style="display: none" onchange="importaEsami(this)"
+                    accept=".txt,.xlsx,.xls">
+            </div>
+
+            <!-- Nuova sezione per gestione LocalStorage -->
+            <div class="storage-container">
+                <div class="storage-info">
+                    <i class="fas fa-save"></i>
+                    <span>I tuoi dati vengono salvati automaticamente nel browser</span>
+                </div>
+                <div class="storage-buttons">
+                    <span class="dati-salvati-text" id="statusSalvataggio">
+                        <i class="fas fa-check"></i> Dati salvati
+                    </span>
+                    <button onclick="caricaDaLocalStorage()" title="Ricarica i dati salvati nel browser">
+                        <i class="fas fa-sync-alt"></i> Ricarica
+                    </button>
+                    <button onclick="mostraInfoLocalStorage()" title="Visualizza informazioni sui dati salvati">
+                        <i class="fas fa-info-circle"></i> Info
+                    </button>
+                </div>
+            </div>
+            <div class="danger-zone">
+                <button onclick="cancellaLocalStorage()" title="Cancella tutti i dati salvati nel browser"
+                    class="btn-danger-outline">
+                    <i class="fas fa-trash"></i> Cancella tutti i dati
+                </button>
+            </div>
+
+            <table id="tabellaEsami">
+                <thead>
+                    <tr>
+                        <th>Nome Esame</th>
+                        <th>CFU</th>
+                        <th>Voto</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" placeholder="Nome esame"></td>
+                        <td><input type="number" min="1" max="30" placeholder="CFU"></td>
+                        <td>
+                            <div class="voto-container">
+                                <input type="number" min="18" max="30" placeholder="Voto" class="voto-input">
+                                <label class="lode-label" title="Con Lode">
+                                    <input type="checkbox" class="lode-checkbox"> Lode
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="remove-icon" onclick="rimuoviRiga(this)">
+                                <i class="fas fa-trash-alt"></i> <!-- Icona cestino -->
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="table-actions">
+                <button class="btn-ghost" onclick="aggiungiRiga()">+ Aggiungi Nuovo Esame</button>
+                <button class="btn-primary" onclick="calcolaMetriche()">Calcola Medie</button>
+            </div>
+            <div class="target-section">
+                <p class="target-description">
+                    Inserisci il voto di laurea che vorresti ottenere (60-110) per vedere quali voti minimi dovresti
+                    prendere negli esami mancanti (quelli per cui non hai inserito il voto).
+                </p>
+
+                <!-- Toggle per scegliere il tipo di calcolo -->
+                <div class="toggle-container">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggleSconto" checked onchange="aggiornaDescrizioneToggle()">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text" id="toggleDescription">
+                            Calcola con sconto 5 CFU sull'esame peggiore
+                        </span>
+                    </label>
+                </div>
+
+                <div class="target-voto">
+                    <input type="number" id="votoTarget" min="60" max="110" placeholder="Voto target" />
+                    <button onclick="prevediVoti()">Prevedi Voti</button>
+                </div>
+                <div id="messaggioImpossibile" class="messaggio-impossibile" style="display: none;">
+                    Purtroppo è impossibile raggiungere questo voto target.
+                </div>
+            </div>
+
+            <div class="result-box">
+                <h3>Risultati</h3>
+                <div class="result-item">Media Ponderata: <span id="mediaPonderata">-</span></div>
+                <div class="result-item">Previsione Voto di Laurea: <span id="previsioneLaureaMedia">-</span></div>
+                <div class="result-item">Media Ponderata (sconto 5 CFU): <span id="mediaPonderataSconto">-</span></div>
+                <div class="result-item">Previsione Voto di Laurea (sconto 5 CFU): <span id="previsioneLaurea">-</span>
+                </div>
+            </div>
+
+            <!-- I grafici ora si trovano qui sotto i risultati -->
+            <div class="dashboard-charts" style="display: none;">
+                <div class="chart-container">
+                    <canvas id="chartLine"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartBar"></canvas>
+                </div>
+            </div>
+
+            <div class="footer">
                 <p>Davide Mariani &copy; 2025</p>
             </div>
         </div>
     </div>
 </body>
+
 </html>
