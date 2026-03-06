@@ -1,3 +1,27 @@
+// Inizializza il tema il prima possibile per evitare FOUC (Flash of Unstyled Content)
+(function () {
+    const savedTheme = localStorage.getItem('uni-tracker-theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+    // Ascolta i cambiamenti del tema di sistema in tempo reale
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            const newTheme = e.matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('uni-tracker-theme', newTheme);
+
+            // Se la funzione è già disponibile (es. cambio a pagina caricata), aggiorna il bottone
+            if (typeof aggiornaPulsanteTema === 'function') {
+                aggiornaPulsanteTema(newTheme);
+            }
+        });
+    }
+})();
+
 // Funzione helper per gestire l'agibilità della casella "Lode"
 function impostaLogicaLode(inputVoto, inputLode) {
     if (!inputVoto || !inputLode) return;
@@ -1142,5 +1166,34 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         // Imposta l'icona corretta del toggle all'avvio
         aggiornaDescrizioneToggle();
+
+        // Imposta il pulsante del tema corretto
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        if (typeof aggiornaPulsanteTema === 'function') {
+            aggiornaPulsanteTema(currentTheme);
+        }
     }, 100);
 });
+
+// ===== THEME MANAGEMENT =====
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('uni-tracker-theme', newTheme);
+
+    aggiornaPulsanteTema(newTheme);
+}
+
+function aggiornaPulsanteTema(theme) {
+    const themeBtn = document.getElementById('themeToggleBtn');
+    if (themeBtn) {
+        if (theme === 'dark') {
+            themeBtn.innerHTML = '<i class="fas fa-sun"></i> Tema Chiaro';
+        } else {
+            themeBtn.innerHTML = '<i class="fas fa-moon"></i> Tema Scuro';
+        }
+    }
+}

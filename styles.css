@@ -1115,3 +1115,130 @@ td {
         flex: 1;
     }
 }
+
+/* ===== DARK THEME ===== */
+[data-theme="dark"] {
+    --bg-main: #121212;
+    --text-main: #e0e0e0;
+    --text-muted: #aaaaaa;
+    --bg-card: #1e1e1e;
+    --border-color: #333333;
+    --bg-hover: #2a2a2a;
+    --input-bg: #2a2a2a;
+    --input-focus: #3a3a3a;
+}
+
+[data-theme="dark"] body {
+    background: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .button-container {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    color: var(--text-main) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] table,
+[data-theme="dark"] .result-box,
+[data-theme="dark"] .footer,
+[data-theme="dark"] tr,
+[data-theme="dark"] .target-section,
+[data-theme="dark"] .storage-container,
+[data-theme="dark"] .chart-container {
+    background: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] .result-box h3,
+[data-theme="dark"] .storage-info {
+    color: #ffffff !important;
+    border-color: var(--border-color) !important;
+    background: transparent !important;
+}
+
+[data-theme="dark"] th {
+    background-color: #004494 !important;
+}
+
+[data-theme="dark"] th,
+[data-theme="dark"] td {
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] tr:hover td {
+    background-color: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] td input:not([type="checkbox"]),
+[data-theme="dark"] .target-voto input {
+    background-color: var(--input-bg) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] td input:not([type="checkbox"]):focus,
+[data-theme="dark"] .target-voto input:focus {
+    background-color: var(--input-focus) !important;
+    border-color: #007BFF !important;
+}
+
+[data-theme="dark"] td input:not([type="checkbox"]):hover {
+    background-color: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .lode-label,
+[data-theme="dark"] .target-description,
+[data-theme="dark"] td:before,
+[data-theme="dark"] .toggle-text {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .result-item {
+    background: var(--input-bg) !important;
+}
+
+[data-theme="dark"] .result-item:hover {
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .btn-secondary {
+    color: var(--text-muted) !important;
+    border-color: var(--border-color) !important;
+    background: transparent !important;
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: var(--bg-hover) !important;
+    color: var(--text-main) !important;
+    border-color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .toggle-container {
+    background: var(--bg-main) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .lode-label {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Mobile specific dark mode fixes */
+@media screen and (max-width: 600px) {
+    [data-theme="dark"] .lode-label {
+        background: var(--input-bg) !important;
+    }
+
+    [data-theme="dark"] .remove-icon {
+        background: #4a1a1a !important;
+        color: #ff6b6b !important;
+    }
+}
